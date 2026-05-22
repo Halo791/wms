@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowUpFromLine, Search, Route, PackageCheck, Truck, Clock, MapPin, ChevronRight, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import api from '../services/api';
+import Select from 'react-select';
 import './Outbound.css';
 
 const Outbound = () => {
@@ -132,20 +133,20 @@ const Outbound = () => {
             <div className="glass pick-form-card">
               <h3 className="card-title"><Search size={18} /> Pilih Produk & Kuantitas</h3>
 
-              <div className="product-selector">
-                {products.map(p => (
-                  <div
-                    key={p.id}
-                    className={`product-option ${selectedProduct?.id === p.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedProduct(p)}
-                  >
-                    <div className="product-option-info">
-                      <span className="sku-label">{p.sku}</span>
-                      <span className="product-name">{p.name}</span>
-                    </div>
-                    <span className="uom-label">{p.uom}</span>
-                  </div>
-                ))}
+              <div className="product-selector" style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Pilih Produk</label>
+                <Select
+                  options={products.map(p => ({ value: p.id, label: `${p.sku} - ${p.name}`, product: p }))}
+                  onChange={opt => setSelectedProduct(opt.product)}
+                  value={selectedProduct ? { value: selectedProduct.id, label: `${selectedProduct.sku} - ${selectedProduct.name}` } : null}
+                  placeholder="Ketik nama atau SKU..."
+                  styles={{
+                    control: (base) => ({ ...base, background: 'rgba(0,0,0,0.2)', borderColor: 'var(--border)', color: 'white' }),
+                    menu: (base) => ({ ...base, background: '#1e293b' }),
+                    option: (base, { isFocused }) => ({ ...base, background: isFocused ? 'rgba(99, 102, 241, 0.2)' : 'transparent', color: 'white' }),
+                    singleValue: (base) => ({ ...base, color: 'white' })
+                  }}
+                />
               </div>
 
               <div className="qty-input-row">

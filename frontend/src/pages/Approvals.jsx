@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Activity, CheckCircle2, XCircle, Clock, Search, ListFilter, AlertTriangle } from 'lucide-react';
 import api from '../services/api';
+import toast from 'react-hot-toast';
 import './SupplyChain.css';
 
 const Approvals = () => {
@@ -54,9 +55,10 @@ const Approvals = () => {
     try {
       await api.processApproval(activeApproval.id, { status: approvalAction, notes: approvalNotes });
       setShowNotesModal(false);
+      toast.success(`Transaksi di-${approvalAction.toLowerCase()}`);
       loadApprovals();
     } catch (e) {
-      alert(e.data?.message || 'Gagal memproses approval.');
+      toast.error(e.data?.message || 'Gagal memproses approval.');
     }
   };
 

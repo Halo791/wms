@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Package, Plus, Search, Edit2, Trash2, Download, Upload, X, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '../services/api';
+import toast from 'react-hot-toast';
 import './Products.css';
 
 const Products = () => {
@@ -58,9 +59,10 @@ const Products = () => {
         await api.updateProduct(formData.id, formData);
       }
       setShowModal(false);
+      toast.success(modalMode === 'add' ? 'Produk ditambahkan' : 'Produk diupdate');
       fetchProducts();
     } catch (error) {
-      alert(error.data?.message || 'Terjadi kesalahan saat menyimpan data');
+      toast.error(error.data?.message || 'Terjadi kesalahan saat menyimpan data');
     }
   };
 
@@ -82,15 +84,50 @@ const Products = () => {
     try {
       await api.deleteProduct(deleteConfirm);
       setDeleteConfirm(null);
+      toast.success('Produk berhasil dihapus');
       fetchProducts();
     } catch (error) {
-      alert('Gagal menghapus produk');
+      toast.error('Gagal menghapus produk');
     }
   };
 
   // Export & Import
-  const handleExport = () => {
-    window.location.href = api.getExportUrl();
+  const handleExport = async () => {
+    try {
+      setLoading(true);
+      // Fetch all products for export
+      const res = await api.getProducts({ per_page: 1000 });
+      const allProducts = res.data || res;
+      
+      if (!allProducts || allProducts.length === 0) {
+        toast.error('Tidak ada data untuk diexport');
+        return;
+      }
+
+      // Convert to CSV
+      const headers = ['ID', 'SKU', 'Nama Produk', 'Kategori', 'UOM', 'Safety Stock'];
+      const csvRows = [
+        headers.join(','),
+        ...allProducts.map(p => 
+          [p.id, p.sku, `"${p.name}"`, p.category, p.uom, p.safety_stock].join(',')
+        )
+      ];
+      
+      const csvContent = "data:text/csv;charset=utf-8," + csvRows.join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Master_Produk_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success('File CSV berhasil diunduh');
+    } catch (error) {
+      toast.error('Gagal mengekspor data');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleImportClick = () => {
@@ -107,10 +144,10 @@ const Products = () => {
     try {
       setLoading(true);
       const res = await api.importProducts(fd);
-      alert(res.message);
+      toast.success(res.message || 'Import berhasil');
       fetchProducts();
     } catch (error) {
-      alert(error.data?.message || 'Gagal mengimpor file');
+      toast.error(error.data?.message || 'Gagal mengimpor file');
     } finally {
       e.target.value = null; // reset input
       setLoading(false);
