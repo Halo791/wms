@@ -4,8 +4,7 @@ vendor/
 
 # Environment
 .env
-.env.backup
-.env.production
+
 
 # IDE
 .idea/

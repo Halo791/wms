@@ -20,6 +20,10 @@ class InventoryTransaction extends Model
         'reference_document',
         'operator_id',
         'notes',
+        'status',
+        'approved_by',
+        'approved_at',
+        'approval_notes',
     ];
 
     public function product()
