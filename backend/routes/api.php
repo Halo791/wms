@@ -84,4 +84,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Notifications
     Route::get('/notifications', [OperationalController::class, 'getNotifications']);
     Route::put('/notifications/{id}/read', [OperationalController::class, 'markNotificationRead']);
+    
+    // Dashboard Stats
+    Route::get('/dashboard/stats', [OperationalController::class, 'getDashboardStats']);
 });

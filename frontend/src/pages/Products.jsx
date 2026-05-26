@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Package, Plus, Search, Edit2, Trash2, Download, Upload, X, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '../services/api';
-import toast from 'react-hot-toast';
 import './Products.css';
 
 const Products = () => {
@@ -59,10 +58,9 @@ const Products = () => {
         await api.updateProduct(formData.id, formData);
       }
       setShowModal(false);
-      toast.success(modalMode === 'add' ? 'Produk ditambahkan' : 'Produk diupdate');
       fetchProducts();
     } catch (error) {
-      toast.error(error.data?.message || 'Terjadi kesalahan saat menyimpan data');
+      alert(error.data?.message || 'Terjadi kesalahan saat menyimpan data');
     }
   };
 
@@ -84,50 +82,15 @@ const Products = () => {
     try {
       await api.deleteProduct(deleteConfirm);
       setDeleteConfirm(null);
-      toast.success('Produk berhasil dihapus');
       fetchProducts();
     } catch (error) {
-      toast.error('Gagal menghapus produk');
+      alert('Gagal menghapus produk');
     }
   };
 
   // Export & Import
-  const handleExport = async () => {
-    try {
-      setLoading(true);
-      // Fetch all products for export
-      const res = await api.getProducts({ per_page: 1000 });
-      const allProducts = res.data || res;
-      
-      if (!allProducts || allProducts.length === 0) {
-        toast.error('Tidak ada data untuk diexport');
-        return;
-      }
-
-      // Convert to CSV
-      const headers = ['ID', 'SKU', 'Nama Produk', 'Kategori', 'UOM', 'Safety Stock'];
-      const csvRows = [
-        headers.join(','),
-        ...allProducts.map(p => 
-          [p.id, p.sku, `"${p.name}"`, p.category, p.uom, p.safety_stock].join(',')
-        )
-      ];
-      
-      const csvContent = "data:text/csv;charset=utf-8," + csvRows.join('\n');
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `Master_Produk_${new Date().toISOString().split('T')[0]}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      toast.success('File CSV berhasil diunduh');
-    } catch (error) {
-      toast.error('Gagal mengekspor data');
-    } finally {
-      setLoading(false);
-    }
+  const handleExport = () => {
+    window.location.href = api.getExportUrl();
   };
 
   const handleImportClick = () => {
@@ -144,10 +107,10 @@ const Products = () => {
     try {
       setLoading(true);
       const res = await api.importProducts(fd);
-      toast.success(res.message || 'Import berhasil');
+      alert(res.message);
       fetchProducts();
     } catch (error) {
-      toast.error(error.data?.message || 'Gagal mengimpor file');
+      alert(error.data?.message || 'Gagal mengimpor file');
     } finally {
       e.target.value = null; // reset input
       setLoading(false);
@@ -221,9 +184,25 @@ const Products = () => {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan="6" className="text-center py-4">Memuat data dari server...</td></tr>
+                <tr>
+                  <td colSpan="6">
+                    <div className="table-loading-state">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+                      <div className="table-state-title">Memuat Data</div>
+                      <div className="table-state-desc">Sedang mengambil master data dari server...</div>
+                    </div>
+                  </td>
+                </tr>
               ) : products.length === 0 ? (
-                <tr><td colSpan="6" className="text-center py-4 text-muted">Data tidak ditemukan.</td></tr>
+                <tr>
+                  <td colSpan="6">
+                    <div className="table-empty-state">
+                      <Package />
+                      <div className="table-state-title">Tidak ada produk ditemukan</div>
+                      <div className="table-state-desc">Gunakan filter atau pencarian lain, atau klik Tambah SKU.</div>
+                    </div>
+                  </td>
+                </tr>
               ) : (
                 products.map(product => (
                   <tr key={product.id}>
@@ -305,7 +284,7 @@ const Products = () => {
             <p>Yakin ingin menghapus produk ini secara permanen?</p>
             <div className="modal-footer" style={{ marginTop: '1.5rem' }}>
               <button className="secondary-btn" onClick={() => setDeleteConfirm(null)}>Batal</button>
-              <button className="primary-btn" style={{ background: '#ef4444', color: 'white' }} onClick={handleDelete}>Ya, Hapus</button>
+              <button className="primary-btn" style={{ background: 'var(--danger)', color: 'white' }} onClick={handleDelete}>Ya, Hapus</button>
             </div>
           </div>
         </div>

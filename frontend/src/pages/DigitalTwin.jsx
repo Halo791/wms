@@ -9,6 +9,9 @@ const DigitalTwin = () => {
   const [selectedLoc, setSelectedLoc] = useState(null);
   const [compacting, setCompacting] = useState(false);
   const [compactionLogs, setCompactionLogs] = useState(null);
+  
+  // Filter status state
+  const [filterStatus, setFilterStatus] = useState('ALL');
 
   useEffect(() => {
     loadMap();
@@ -18,7 +21,7 @@ const DigitalTwin = () => {
     setLoading(true);
     try {
       const data = await api.getWarehouseMap();
-      setMapData(data);
+      setMapData(data || []);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
   };
@@ -82,9 +85,27 @@ const DigitalTwin = () => {
               <div className="wh-header">
                 <h3><Box size={18} /> {wh.warehouse.name} <span className="wh-code">({wh.warehouse.code})</span></h3>
                 <div className="wh-stats">
-                  <span className="stat-chip full">{wh.summary.full} Penuh</span>
-                  <span className="stat-chip partial">{wh.summary.partial} Sebagian</span>
-                  <span className="stat-chip empty">{wh.summary.empty} Kosong</span>
+                  <span 
+                    className={`stat-chip full ${filterStatus === 'full' ? 'active' : ''}`}
+                    onClick={() => setFilterStatus(filterStatus === 'full' ? 'ALL' : 'full')}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {wh.summary.full} Penuh
+                  </span>
+                  <span 
+                    className={`stat-chip partial ${filterStatus === 'partial' ? 'active' : ''}`}
+                    onClick={() => setFilterStatus(filterStatus === 'partial' ? 'ALL' : 'partial')}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {wh.summary.partial} Sebagian
+                  </span>
+                  <span 
+                    className={`stat-chip empty ${filterStatus === 'empty' ? 'active' : ''}`}
+                    onClick={() => setFilterStatus(filterStatus === 'empty' ? 'ALL' : 'empty')}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {wh.summary.empty} Kosong
+                  </span>
                 </div>
               </div>
 
@@ -95,6 +116,10 @@ const DigitalTwin = () => {
                     className={`rack-cell ${loc.status} ${selectedLoc?.id === loc.id ? 'selected' : ''}`}
                     onClick={() => setSelectedLoc(loc)}
                     title={`${loc.barcode} — ${getStatusLabel(loc.status)}`}
+                    style={{ 
+                      opacity: filterStatus === 'ALL' || filterStatus === loc.status ? 1 : 0.15,
+                      transition: 'opacity 0.25s ease'
+                    }}
                   >
                     <div className="rack-fill-bar" style={{ height: `${Math.min(loc.total_qty * 2, 100)}%`, backgroundColor: getStatusColor(loc.status) }}></div>
                     <span className="rack-label">{loc.zone}{loc.tier || ''}</span>
@@ -149,12 +174,14 @@ const DigitalTwin = () => {
                 {selectedLoc.products && selectedLoc.products.length > 0 && (
                   <div className="detail-products">
                     <span className="detail-label">Isi Palet:</span>
-                    {selectedLoc.products.map((p, i) => (
-                      <div key={i} className="product-chip">
-                        <Package size={14} />
-                        <span>{p.sku} — {p.name} ({p.qty} {p.uom})</span>
-                      </div>
-                    ))}
+                    <div style={{ maxHeight: '180px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      {selectedLoc.products.map((p, i) => (
+                        <div key={i} className="product-chip">
+                          <Package size={14} />
+                          <span>{p.sku} — {p.name} ({p.qty} {p.uom})</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -182,7 +209,7 @@ const DigitalTwin = () => {
               <div className="text-muted text-center" style={{ padding: '2rem', fontSize: '0.9rem' }}>
                 {compacting ? (
                   <div className="compaction-running">
-                    <Zap size={24} className="spinning" style={{ color: '#f59e0b' }} />
+                    <Zap size={24} className="spinning" style={{ color: 'var(--warning)' }} />
                     <p>Menjalankan Night Compaction...</p>
                     <p className="text-sm">Robot ASRS sedang merapikan gudang</p>
                   </div>
@@ -193,11 +220,32 @@ const DigitalTwin = () => {
 
           {/* Legend */}
           <div className="glass legend-card">
-            <h4 className="panel-title">Legenda Peta</h4>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+              <h4 className="panel-title" style={{ margin: 0 }}>Legenda Peta</h4>
+              {filterStatus !== 'ALL' && <button onClick={() => setFilterStatus('ALL')} style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.75rem' }}>Reset Filter</button>}
+            </div>
             <div className="legend-items">
-              <div className="legend-item"><span className="legend-color" style={{ backgroundColor: '#10b981' }}></span> Kosong (Available)</div>
-              <div className="legend-item"><span className="legend-color" style={{ backgroundColor: '#f59e0b' }}></span> Terisi Sebagian</div>
-              <div className="legend-item"><span className="legend-color" style={{ backgroundColor: '#ef4444' }}></span> Penuh (Full)</div>
+              <div 
+                className={`legend-item ${filterStatus === 'empty' ? 'active-legend' : ''}`} 
+                onClick={() => setFilterStatus(filterStatus === 'empty' ? 'ALL' : 'empty')}
+                style={{ cursor: 'pointer', padding: '0.2rem 0.5rem', borderRadius: '4px', background: filterStatus === 'empty' ? 'rgba(255,255,255,0.05)' : '' }}
+              >
+                <span className="legend-color" style={{ backgroundColor: 'var(--success)' }}></span> Kosong (Available)
+              </div>
+              <div 
+                className={`legend-item ${filterStatus === 'partial' ? 'active-legend' : ''}`} 
+                onClick={() => setFilterStatus(filterStatus === 'partial' ? 'ALL' : 'partial')}
+                style={{ cursor: 'pointer', padding: '0.2rem 0.5rem', borderRadius: '4px', background: filterStatus === 'partial' ? 'rgba(255,255,255,0.05)' : '' }}
+              >
+                <span className="legend-color" style={{ backgroundColor: 'var(--warning)' }}></span> Terisi Sebagian
+              </div>
+              <div 
+                className={`legend-item ${filterStatus === 'full' ? 'active-legend' : ''}`} 
+                onClick={() => setFilterStatus(filterStatus === 'full' ? 'ALL' : 'full')}
+                style={{ cursor: 'pointer', padding: '0.2rem 0.5rem', borderRadius: '4px', background: filterStatus === 'full' ? 'rgba(255,255,255,0.05)' : '' }}
+              >
+                <span className="legend-color" style={{ backgroundColor: 'var(--danger)' }}></span> Penuh (Full)
+              </div>
               <div className="legend-item"><span className="legend-color selected-border"></span> Lokasi Terpilih</div>
             </div>
           </div>

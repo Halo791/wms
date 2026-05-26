@@ -59,7 +59,7 @@ class OperationalController extends Controller
         
         try {
             DB::beginTransaction();
-            $trx = InventoryTransaction::lockForUpdate()->findOrFail($id);
+            $trx = InventoryTransaction::findOrFail($id);
             if ($trx->status !== 'PENDING') throw new \Exception("Transaksi sudah diproses sebelumnya.");
 
             $trx->status = $request->status;
@@ -73,7 +73,7 @@ class OperationalController extends Controller
                 if ($trx->type === 'INBOUND' || $trx->type === 'RETURN' || $trx->type === 'ADJUSTMENT_UP') {
                     $stock = InventoryStock::where('product_id', $trx->product_id)
                         ->where('location_id', $trx->destination_location_id)
-                        ->lockForUpdate()
+                        
                         ->first();
                         
                     if (!$stock) {
@@ -89,7 +89,7 @@ class OperationalController extends Controller
                 elseif ($trx->type === 'OUTBOUND' || $trx->type === 'ADJUSTMENT_DOWN') {
                     $stock = InventoryStock::where('product_id', $trx->product_id)
                         ->where('location_id', $trx->source_location_id)
-                        ->lockForUpdate()
+                        
                         ->first();
                         
                     if (!$stock || $stock->quantity < $trx->quantity) throw new \Exception("Stok fisik tidak mencukupi untuk di-approve.");
@@ -100,7 +100,7 @@ class OperationalController extends Controller
                     // Kurangi dari source
                     $sourceStock = InventoryStock::where('product_id', $trx->product_id)
                         ->where('location_id', $trx->source_location_id)
-                        ->lockForUpdate()
+                        
                         ->first();
                         
                     if (!$sourceStock || $sourceStock->quantity < $trx->quantity) throw new \Exception("Stok sumber tidak mencukupi.");
@@ -110,7 +110,7 @@ class OperationalController extends Controller
                     // Tambah ke destination
                     $destStock = InventoryStock::where('product_id', $trx->product_id)
                         ->where('location_id', $trx->destination_location_id)
-                        ->lockForUpdate()
+                        
                         ->first();
                         
                     if (!$destStock) {
@@ -164,7 +164,7 @@ class OperationalController extends Controller
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
             'source_location_id' => 'nullable|exists:locations,id',
-            'destination_location_id' => 'nullable|exists:locations,id',
+            'destination_location_id' => 'nullable|exists:locations,id|different:source_location_id',
             'notes' => 'required|string'
         ]);
 
@@ -195,6 +195,86 @@ class OperationalController extends Controller
             return response()->json(['success' => true, 'message' => 'Transaksi diajukan, menunggu Approval.']);
         } catch (\Exception $e) {
             DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
+
+    // ==========================================
+    // DASHBOARD OVERVIEW STATS
+    // ==========================================
+    public function getDashboardStats(Request $request)
+    {
+        try {
+            $totalSkuInStock = InventoryStock::where('quantity', '>', 0)->distinct('product_id')->count('product_id');
+            
+            $lowStockAlerts = Product::where('safety_stock', '>', 0)
+                ->where(function($query) {
+                    $query->selectRaw('COALESCE(SUM(quantity), 0)')
+                        ->from('inventory_stocks')
+                        ->whereColumn('inventory_stocks.product_id', 'products.id');
+                }, '<', DB::raw('safety_stock'))
+                ->count();
+
+            $todayInboundCount = InventoryTransaction::where('type', 'INBOUND')
+                ->whereDate('created_at', today())
+                ->sum('quantity');
+
+            $todayOutboundCount = InventoryTransaction::where('type', 'OUTBOUND')
+                ->whereDate('created_at', today())
+                ->sum('quantity');
+
+            // Last 7 days movement
+            $dates = collect(range(0, 6))->map(fn($i) => now()->subDays($i)->format('Y-m-d'))->reverse()->values();
+            
+            $inboundData = InventoryTransaction::where('type', 'INBOUND')
+                ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+                ->selectRaw('DATE(created_at) as date, SUM(quantity) as qty')
+                ->groupBy('date')
+                ->pluck('qty', 'date');
+
+            $outboundData = InventoryTransaction::where('type', 'OUTBOUND')
+                ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+                ->selectRaw('DATE(created_at) as date, SUM(quantity) as qty')
+                ->groupBy('date')
+                ->pluck('qty', 'date');
+
+            $movement = $dates->map(function($date) use ($inboundData, $outboundData) {
+                return [
+                    'date' => date('d M', strtotime($date)),
+                    'inbound' => (int) $inboundData->get($date, 0),
+                    'outbound' => (int) $outboundData->get($date, 0),
+                ];
+            });
+
+            // Recent activity
+            $recentActivity = InventoryTransaction::with(['product', 'operator'])
+                ->orderBy('created_at', 'desc')
+                ->limit(5)
+                ->get()
+                ->map(function($trx) {
+                    return [
+                        'id' => $trx->id,
+                        'code' => $trx->transaction_code,
+                        'type' => $trx->type,
+                        'product_sku' => $trx->product ? $trx->product->sku : 'N/A',
+                        'product_name' => $trx->product ? $trx->product->name : 'Unknown',
+                        'quantity' => $trx->quantity,
+                        'operator' => $trx->operator ? $trx->operator->username : 'System',
+                        'time' => $trx->created_at->diffForHumans()
+                    ];
+                });
+
+            return response()->json([
+                'stats' => [
+                    'total_sku' => $totalSkuInStock,
+                    'low_stock' => $lowStockAlerts,
+                    'today_inbound' => (int) $todayInboundCount,
+                    'today_outbound' => (int) $todayOutboundCount,
+                ],
+                'movement' => $movement,
+                'recent_activity' => $recentActivity
+            ]);
+        } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }

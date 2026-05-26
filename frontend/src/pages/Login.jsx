@@ -27,7 +27,7 @@ const Login = () => {
 
   return (
     <div style={{ display: 'flex', height: '100vh', background: 'var(--bg-base)', color: 'var(--text-primary)', alignItems: 'center', justifyContent: 'center' }}>
-      <div className="glass-panel" style={{ width: '400px', padding: '2.5rem', borderRadius: '16px', textAlign: 'center', boxShadow: 'var(--shadow-lg)' }}>
+      <div className="glass-panel" style={{ width: '400px', padding: '2.5rem', textAlign: 'center' }}>
         <div style={{ marginBottom: '2rem' }}>
           <Layers size={56} color="var(--primary)" style={{ marginBottom: '1rem', dropShadow: '0 4px 6px rgba(99, 102, 241, 0.3)' }} />
           <h2 style={{ margin: 0, fontSize: '1.8rem' }}>Aero<span style={{ color: 'var(--primary)' }}>WMS</span></h2>

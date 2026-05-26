@@ -6,6 +6,8 @@ import Products from './pages/Products';
 import Inventory from './pages/Inventory';
 import Inbound from './pages/Inbound';
 import Outbound from './pages/Outbound';
+import StockOpname from './pages/StockOpname';
+import Transfer from './pages/Transfer';
 import SupplyChain from './pages/SupplyChain';
 import Fulfillment from './pages/Fulfillment';
 import Approvals from './pages/Approvals';
@@ -14,21 +16,12 @@ import './index.css';
 import './App.css';
 
 import Login from './pages/Login';
-import { Toaster } from 'react-hot-toast';
 
 function App() {
   const token = localStorage.getItem('wms_token');
 
   return (
     <BrowserRouter>
-      <Toaster 
-        position="top-right" 
-        toastOptions={{
-          style: { background: '#1e293b', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' },
-          success: { iconTheme: { primary: '#10b981', secondary: '#fff' } },
-          error: { iconTheme: { primary: '#ef4444', secondary: '#fff' } }
-        }} 
-      />
       <Routes>
         <Route path="/login" element={<Login />} />
         
@@ -40,6 +33,8 @@ function App() {
           <Route path="supply-chain" element={<SupplyChain />} />
           <Route path="inbound" element={<Inbound />} />
           <Route path="outbound" element={<Outbound />} />
+          <Route path="stock-opname" element={<StockOpname />} />
+          <Route path="transfer" element={<Transfer />} />
           <Route path="fulfillment" element={<Fulfillment />} />
           <Route path="approvals" element={<Approvals />} />
         </Route>

@@ -1,4 +1,4 @@
-const API_BASE = '/api';
+const API_BASE = 'http://127.0.0.1:8000/api';
 
 function getToken() {
   return localStorage.getItem('wms_token');
@@ -136,6 +136,12 @@ const api = {
   processApproval: (id, data) => request(`/approvals/${id}/process`, { method: 'POST', body: JSON.stringify(data) }),
   
   submitManualTransaction: (data) => request('/transactions/manual', { method: 'POST', body: JSON.stringify(data) }),
+
+  // Receiving (Barang Masuk terhubung PO)
+  submitReceiving: (data) => request('/inbound/receive', { method: 'POST', body: JSON.stringify(data) }),
+
+  // Dashboard Stats
+  getDashboardStats: () => request('/dashboard/stats'),
 };
 
 export default api;

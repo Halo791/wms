@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Plus, X, ChevronLeft, ChevronRight, ShoppingCart, PackageCheck, Truck as TruckIcon, FileText } from 'lucide-react';
+import { Users, Plus, X, ChevronLeft, ChevronRight, ShoppingCart, PackageCheck, Truck as TruckIcon } from 'lucide-react';
 import api from '../services/api';
-import toast from 'react-hot-toast';
-import Select from 'react-select';
-import { useReactToPrint } from 'react-to-print';
-import PrintDO from '../components/PrintDO';
 import './SupplyChain.css'; // shared styles
 
 const Fulfillment = () => {
@@ -15,8 +11,7 @@ const Fulfillment = () => {
   const [custPage, setCustPage] = useState(1);
   const [custTotalPages, setCustTotalPages] = useState(1);
   const [showCustModal, setShowCustModal] = useState(false);
-  const [custMode, setCustMode] = useState('add');
-  const [custForm, setCustForm] = useState({ id: null, code: '', name: '', contact_person: '', phone: '', email: '', address: '' });
+  const [custForm, setCustForm] = useState({ code: '', name: '', contact_person: '', phone: '', email: '', address: '' });
 
   // SO
   const [sos, setSos] = useState([]);
@@ -34,22 +29,6 @@ const Fulfillment = () => {
   const [showShipModal, setShowShipModal] = useState(false);
   const [shipForm, setShipForm] = useState({ so_id: '', carrier: '', notes: '' });
   const [allSOs, setAllSOs] = useState([]);
-
-  // Printing
-  const printRef = React.useRef();
-  const [printingShipment, setPrintingShipment] = useState(null);
-
-  const handlePrint = useReactToPrint({
-    content: () => printRef.current,
-    onAfterPrint: () => setPrintingShipment(null),
-  });
-
-  const triggerPrint = (shipment) => {
-    setPrintingShipment(shipment);
-    setTimeout(() => {
-      handlePrint();
-    }, 100); // slight delay to allow React to render the hidden component
-  };
 
   useEffect(() => { loadCustomers(); loadSOs(); loadShipments(); loadProducts(); }, [custPage, soPage, shipPage]);
 
@@ -87,60 +66,43 @@ const Fulfillment = () => {
 
   const saveCust = async (e) => {
     e.preventDefault();
-    try { 
-      if (custMode === 'add') {
-        await api.createCustomer(custForm); 
-        toast.success('Customer berhasil ditambahkan'); 
-      } else {
-        await api.updateCustomer(custForm.id, custForm);
-        toast.success('Customer berhasil diupdate');
-      }
-      setShowCustModal(false); 
-      setCustForm({ id: null, code: '', name: '', contact_person: '', phone: '', email: '', address: '' }); 
-      loadCustomers(); 
-    }
-    catch (err) { toast.error(err.data?.message || 'Gagal menyimpan'); }
-  };
-
-  const openEditCust = (c) => {
-    setCustMode('edit');
-    setCustForm(c);
-    setShowCustModal(true);
+    try { await api.createCustomer(custForm); setShowCustModal(false); setCustForm({ code: '', name: '', contact_person: '', phone: '', email: '', address: '' }); loadCustomers(); }
+    catch (err) { alert(err.data?.message || 'Gagal menyimpan'); }
   };
 
   const deleteCust = async (id) => {
     if (!confirm('Hapus customer?')) return;
-    try { await api.deleteCustomer(id); toast.success('Customer dihapus'); loadCustomers(); } catch (e) { toast.error('Gagal menghapus'); }
+    try { await api.deleteCustomer(id); loadCustomers(); } catch (e) { alert('Gagal menghapus'); }
   };
 
   const saveSO = async (e) => {
     e.preventDefault();
-    try { await api.createSalesOrder(soForm); setShowSOModal(false); setSoForm({ customer_id: '', order_date: '', ship_by_date: '', notes: '', items: [{ product_id: '', ordered_qty: 1 }] }); toast.success('SO dibuat'); loadSOs(); }
-    catch (err) { toast.error(err.data?.message || 'Gagal membuat SO'); }
+    try { await api.createSalesOrder(soForm); setShowSOModal(false); setSoForm({ customer_id: '', order_date: '', ship_by_date: '', notes: '', items: [{ product_id: '', ordered_qty: 1 }] }); loadSOs(); }
+    catch (err) { alert(err.data?.message || 'Gagal membuat SO'); }
   };
 
-  const updateSOStat = async (id, status) => { try { await api.updateSOStatus(id, status); toast.success('Status diubah'); loadSOs(); loadShipments(); } catch (e) { toast.error('Gagal mengubah status'); } };
+  const updateSOStat = async (id, status) => { try { await api.updateSOStatus(id, status); loadSOs(); loadShipments(); } catch (e) { alert('Gagal'); } };
 
   const saveShipment = async (e) => {
     e.preventDefault();
-    try { await api.createShipment(shipForm); setShowShipModal(false); setShipForm({ so_id: '', carrier: '', notes: '' }); toast.success('Surat Jalan dibuat'); loadShipments(); loadSOs(); }
-    catch (err) { toast.error(err.data?.message || 'Gagal membuat DO'); }
+    try { await api.createShipment(shipForm); setShowShipModal(false); setShipForm({ so_id: '', carrier: '', notes: '' }); loadShipments(); loadSOs(); }
+    catch (err) { alert(err.data?.message || 'Gagal membuat DO'); }
   };
 
-  const updateShipStat = async (id, status) => { try { await api.updateShipmentStatus(id, status); toast.success('Status diubah'); loadShipments(); loadSOs(); } catch (e) { toast.error('Gagal mengubah status'); } };
+  const updateShipStat = async (id, status) => { try { await api.updateShipmentStatus(id, status); loadShipments(); loadSOs(); } catch (e) { alert('Gagal'); } };
 
   const addSOItem = () => setSoForm(f => ({ ...f, items: [...f.items, { product_id: '', ordered_qty: 1 }] }));
   const removeSOItem = (idx) => setSoForm(f => ({ ...f, items: f.items.filter((_, i) => i !== idx) }));
   const updateSOItem = (idx, field, val) => setSoForm(f => ({ ...f, items: f.items.map((it, i) => i === idx ? { ...it, [field]: val } : it) }));
 
-  const soStatusColors = { DRAFT: '#94a3b8', CONFIRMED: '#6366f1', PICKING: '#f59e0b', PACKING: '#8b5cf6', SHIPPED: '#3b82f6', COMPLETED: '#10b981', CANCELLED: '#ef4444' };
-  const shipStatusColors = { PACKING: '#f59e0b', READY: '#6366f1', DISPATCHED: '#3b82f6', DELIVERED: '#10b981' };
+  const soStatusColors = { DRAFT: '#9CA3AF', CONFIRMED: '#6D5DF6', PICKING: '#f59e0b', PACKING: '#8B7CFF', SHIPPED: '#3b82f6', COMPLETED: '#10b981', CANCELLED: '#ef4444' };
+  const shipStatusColors = { PACKING: '#f59e0b', READY: '#6D5DF6', DISPATCHED: '#3b82f6', DELIVERED: '#10b981' };
 
   return (
     <div className="ff-container">
       <div className="page-header">
         <div className="header-title">
-          <div className="icon-wrapper" style={{ background: 'rgba(16, 185, 129, 0.1)' }}><Users size={24} style={{ color: '#10b981' }} /></div>
+          <div className="icon-wrapper" style={{ background: 'var(--success-transparent)' }}><Users size={24} style={{ color: 'var(--success)' }} /></div>
           <div><h2>Fulfillment (Hilir)</h2><p className="text-muted">Customer, Sales Order, Packing & Shipping</p></div>
         </div>
       </div>
@@ -154,25 +116,25 @@ const Fulfillment = () => {
       {/* CUSTOMERS TAB */}
       {tab === 'customers' && (
         <div className="glass table-card">
-          <div className="table-toolbar"><h3 style={{ margin: 0 }}>Master Customer</h3><button className="primary-btn" onClick={() => { setCustMode('add'); setCustForm({ id: null, code: '', name: '', contact_person: '', phone: '', email: '', address: '' }); setShowCustModal(true); }}><Plus size={18} /> Tambah Customer</button></div>
+          <div className="table-toolbar"><h3 style={{ margin: 0 }}>Master Customer</h3><button className="primary-btn" onClick={() => setShowCustModal(true)}><Plus size={18} /> Tambah Customer</button></div>
           <div className="table-responsive">
             <table className="data-table">
               <thead><tr><th>Kode</th><th>Nama</th><th>Kontak</th><th>Telepon</th><th>Email</th><th className="text-right">Aksi</th></tr></thead>
               <tbody>
                 {customers.map(c => (
-                  <tr key={c.id}>
-                    <td className="mono font-medium">{c.code}</td>
-                    <td>{c.name}</td>
-                    <td>{c.contact_person || '-'}</td>
-                    <td>{c.phone || '-'}</td>
-                    <td>{c.email || '-'}</td>
-                    <td className="text-right action-cells" style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
-                      <button className="icon-btn edit" style={{ color: '#818cf8', background: 'rgba(99,102,241,0.1)' }} onClick={() => openEditCust(c)}>Edit</button>
-                      <button className="icon-btn delete" onClick={() => deleteCust(c.id)}>×</button>
+                  <tr key={c.id}><td className="mono font-medium">{c.code}</td><td>{c.name}</td><td>{c.contact_person || '-'}</td><td>{c.phone || '-'}</td><td>{c.email || '-'}</td><td className="text-right"><button className="icon-btn delete" onClick={() => deleteCust(c.id)}>×</button></td></tr>
+                ))}
+                {customers.length === 0 && (
+                  <tr>
+                    <td colSpan="6">
+                      <div className="table-empty-state">
+                        <Users />
+                        <div className="table-state-title">Belum ada data customer</div>
+                        <div className="table-state-desc">Klik Tambah Customer untuk mendaftarkan mitra bisnis baru.</div>
+                      </div>
                     </td>
                   </tr>
-                ))}
-                {customers.length === 0 && <tr><td colSpan="6" className="text-center text-muted" style={{ padding: '2rem' }}>Belum ada customer.</td></tr>}
+                )}
               </tbody>
             </table>
           </div>
@@ -198,11 +160,21 @@ const Fulfillment = () => {
                     <td>{so.items?.length || 0} SKU</td>
                     <td className="text-right">
                       {so.status === 'CONFIRMED' && <button className="secondary-btn small" onClick={() => updateSOStat(so.id, 'PICKING')}>Picking</button>}
-                      {so.status === 'PICKING' && <button className="secondary-btn small" style={{ borderColor: '#8b5cf6', color: '#8b5cf6' }} onClick={() => updateSOStat(so.id, 'PACKING')}>Packing</button>}
+                      {so.status === 'PICKING' && <button className="secondary-btn small" style={{ borderColor: 'var(--primary)', color: 'var(--primary)' }} onClick={() => updateSOStat(so.id, 'PACKING')}>Packing</button>}
                     </td>
                   </tr>
                 ))}
-                {sos.length === 0 && <tr><td colSpan="7" className="text-center text-muted" style={{ padding: '2rem' }}>Belum ada Sales Order.</td></tr>}
+                {sos.length === 0 && (
+                  <tr>
+                    <td colSpan="7">
+                      <div className="table-empty-state">
+                        <ShoppingCart />
+                        <div className="table-state-title">Belum ada Sales Order</div>
+                        <div className="table-state-desc">Pilih "Buat SO Baru" untuk mulai memproses pesanan customer.</div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -225,17 +197,24 @@ const Fulfillment = () => {
                     <td>{sh.customer?.name || '-'}</td>
                     <td>{sh.carrier || '-'}</td>
                     <td><span className="badge" style={{ background: `${shipStatusColors[sh.status]}22`, color: shipStatusColors[sh.status], border: `1px solid ${shipStatusColors[sh.status]}44` }}>{sh.status}</span></td>
-                    <td className="text-right action-cells" style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
-                      <button className="icon-btn" onClick={() => triggerPrint(sh)} title="Cetak Surat Jalan (DO)" style={{ color: '#fff', background: 'rgba(255,255,255,0.1)' }}>
-                        <FileText size={16} />
-                      </button>
+                    <td className="text-right">
                       {sh.status === 'PACKING' && <button className="secondary-btn small" onClick={() => updateShipStat(sh.id, 'READY')}>Siap Kirim</button>}
                       {sh.status === 'READY' && <button className="secondary-btn small" style={{ borderColor: '#3b82f6', color: '#3b82f6' }} onClick={() => updateShipStat(sh.id, 'DISPATCHED')}>Dikirim</button>}
-                      {sh.status === 'DISPATCHED' && <button className="secondary-btn small" style={{ borderColor: '#10b981', color: '#10b981' }} onClick={() => updateShipStat(sh.id, 'DELIVERED')}>Terkirim</button>}
+                      {sh.status === 'DISPATCHED' && <button className="secondary-btn small" style={{ borderColor: 'var(--success)', color: 'var(--success)' }} onClick={() => updateShipStat(sh.id, 'DELIVERED')}>Terkirim</button>}
                     </td>
                   </tr>
                 ))}
-                {shipments.length === 0 && <tr><td colSpan="6" className="text-center text-muted" style={{ padding: '2rem' }}>Belum ada Delivery Order.</td></tr>}
+                {shipments.length === 0 && (
+                  <tr>
+                    <td colSpan="6">
+                      <div className="table-empty-state">
+                        <TruckIcon />
+                        <div className="table-state-title">Belum ada Delivery Order</div>
+                        <div className="table-state-desc">Pilih "Buat Surat Jalan" untuk mulai proses pengiriman.</div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -246,7 +225,7 @@ const Fulfillment = () => {
       {/* Customer Modal */}
       {showCustModal && (
         <div className="modal-overlay"><div className="modal-content glass">
-          <div className="modal-header"><h3>{custMode === 'add' ? 'Tambah Customer' : 'Edit Customer'}</h3><button className="icon-btn" onClick={() => setShowCustModal(false)}><X size={20} /></button></div>
+          <div className="modal-header"><h3>Tambah Customer</h3><button className="icon-btn" onClick={() => setShowCustModal(false)}><X size={20} /></button></div>
           <form onSubmit={saveCust} className="crud-form">
             <div className="form-row"><div className="form-group"><label>Kode</label><input required value={custForm.code} onChange={e => setCustForm({ ...custForm, code: e.target.value })} /></div><div className="form-group"><label>Nama</label><input required value={custForm.name} onChange={e => setCustForm({ ...custForm, name: e.target.value })} /></div></div>
             <div className="form-row"><div className="form-group"><label>Kontak</label><input value={custForm.contact_person} onChange={e => setCustForm({ ...custForm, contact_person: e.target.value })} /></div><div className="form-group"><label>Telepon</label><input value={custForm.phone} onChange={e => setCustForm({ ...custForm, phone: e.target.value })} /></div></div>
@@ -270,20 +249,7 @@ const Fulfillment = () => {
             <h4 style={{ margin: '1rem 0 0.5rem' }}>Item Pesanan</h4>
             {soForm.items.map((item, idx) => (
               <div key={idx} className="form-row" style={{ alignItems: 'flex-end' }}>
-                <div className="form-group" style={{ flex: 2 }}><label>Produk</label>
-                  <Select 
-                    options={products.map(p => ({ value: p.id, label: `${p.sku} - ${p.name}` }))} 
-                    onChange={opt => updateSOItem(idx, 'product_id', opt.value)}
-                    value={products.filter(p => p.id === item.product_id).map(p => ({ value: p.id, label: `${p.sku} - ${p.name}` }))[0] || null}
-                    placeholder="Ketik nama atau SKU..."
-                    styles={{
-                      control: (base) => ({ ...base, background: 'rgba(0,0,0,0.2)', borderColor: 'var(--border)', color: 'white' }),
-                      menu: (base) => ({ ...base, background: '#1e293b' }),
-                      option: (base, { isFocused }) => ({ ...base, background: isFocused ? 'rgba(99, 102, 241, 0.2)' : 'transparent', color: 'white' }),
-                      singleValue: (base) => ({ ...base, color: 'white' })
-                    }}
-                  />
-                </div>
+                <div className="form-group" style={{ flex: 2 }}><label>Produk</label><select required value={item.product_id} onChange={e => updateSOItem(idx, 'product_id', e.target.value)}><option value="">Pilih</option>{products.map(p => <option key={p.id} value={p.id}>{p.sku} - {p.name}</option>)}</select></div>
                 <div className="form-group" style={{ flex: 1 }}><label>Qty</label><input required type="number" min="1" value={item.ordered_qty} onChange={e => updateSOItem(idx, 'ordered_qty', parseInt(e.target.value))} /></div>
                 {soForm.items.length > 1 && <button type="button" className="icon-btn delete" onClick={() => removeSOItem(idx)} style={{ marginBottom: '0.4rem' }}>×</button>}
               </div>
@@ -306,11 +272,6 @@ const Fulfillment = () => {
           </form>
         </div></div>
       )}
-
-      {/* Hidden Print Component */}
-      <div style={{ display: 'none' }}>
-        <PrintDO ref={printRef} shipment={printingShipment} />
-      </div>
     </div>
   );
 };

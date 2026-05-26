@@ -27,7 +27,9 @@ class InventoryTransactionController extends Controller
             $operatorId = $request->user()->id ?? null;
 
             foreach ($request->scanned_items as $item) {
-                $product = Product::where('barcode', $item['barcode'])->first();
+                $product = Product::where('barcode', $item['barcode'])
+                                  ->orWhere('sku', $item['barcode'])
+                                  ->first();
                 if (!$product) {
                     throw new \Exception("Produk dengan barcode {$item['barcode']} tidak ditemukan.");
                 }
