@@ -16,8 +16,6 @@ RUN apt-get update \
         dom \
         pdo_sqlite \
         sqlite3 \
-        xml \
-        xmlwriter \
         zip \
     && rm -rf /var/lib/apt/lists/*
 
