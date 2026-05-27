@@ -1,9 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LoginRedirectController;
 
 Route::view('/', 'welcome');
 
-Route::get('/login', function () {
-    return redirect(config('app.frontend_url', env('FRONTEND_URL', 'http://localhost:5173')).'/login');
-})->name('login');
+Route::get('/login', LoginRedirectController::class)->name('login');
