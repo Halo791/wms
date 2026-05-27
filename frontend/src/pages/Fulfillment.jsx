@@ -95,14 +95,14 @@ const Fulfillment = () => {
   const removeSOItem = (idx) => setSoForm(f => ({ ...f, items: f.items.filter((_, i) => i !== idx) }));
   const updateSOItem = (idx, field, val) => setSoForm(f => ({ ...f, items: f.items.map((it, i) => i === idx ? { ...it, [field]: val } : it) }));
 
-  const soStatusColors = { DRAFT: '#94a3b8', CONFIRMED: '#6366f1', PICKING: '#f59e0b', PACKING: '#8b5cf6', SHIPPED: '#3b82f6', COMPLETED: '#10b981', CANCELLED: '#ef4444' };
-  const shipStatusColors = { PACKING: '#f59e0b', READY: '#6366f1', DISPATCHED: '#3b82f6', DELIVERED: '#10b981' };
+  const soStatusColors = { DRAFT: '#9CA3AF', CONFIRMED: '#6D5DF6', PICKING: '#f59e0b', PACKING: '#8B7CFF', SHIPPED: '#3b82f6', COMPLETED: '#10b981', CANCELLED: '#ef4444' };
+  const shipStatusColors = { PACKING: '#f59e0b', READY: '#6D5DF6', DISPATCHED: '#3b82f6', DELIVERED: '#10b981' };
 
   return (
     <div className="ff-container">
       <div className="page-header">
         <div className="header-title">
-          <div className="icon-wrapper" style={{ background: 'rgba(16, 185, 129, 0.1)' }}><Users size={24} style={{ color: '#10b981' }} /></div>
+          <div className="icon-wrapper" style={{ background: 'var(--success-transparent)' }}><Users size={24} style={{ color: 'var(--success)' }} /></div>
           <div><h2>Fulfillment (Hilir)</h2><p className="text-muted">Customer, Sales Order, Packing & Shipping</p></div>
         </div>
       </div>
@@ -124,7 +124,17 @@ const Fulfillment = () => {
                 {customers.map(c => (
                   <tr key={c.id}><td className="mono font-medium">{c.code}</td><td>{c.name}</td><td>{c.contact_person || '-'}</td><td>{c.phone || '-'}</td><td>{c.email || '-'}</td><td className="text-right"><button className="icon-btn delete" onClick={() => deleteCust(c.id)}>×</button></td></tr>
                 ))}
-                {customers.length === 0 && <tr><td colSpan="6" className="text-center text-muted" style={{ padding: '2rem' }}>Belum ada customer.</td></tr>}
+                {customers.length === 0 && (
+                  <tr>
+                    <td colSpan="6">
+                      <div className="table-empty-state">
+                        <Users />
+                        <div className="table-state-title">Belum ada data customer</div>
+                        <div className="table-state-desc">Klik Tambah Customer untuk mendaftarkan mitra bisnis baru.</div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -150,11 +160,21 @@ const Fulfillment = () => {
                     <td>{so.items?.length || 0} SKU</td>
                     <td className="text-right">
                       {so.status === 'CONFIRMED' && <button className="secondary-btn small" onClick={() => updateSOStat(so.id, 'PICKING')}>Picking</button>}
-                      {so.status === 'PICKING' && <button className="secondary-btn small" style={{ borderColor: '#8b5cf6', color: '#8b5cf6' }} onClick={() => updateSOStat(so.id, 'PACKING')}>Packing</button>}
+                      {so.status === 'PICKING' && <button className="secondary-btn small" style={{ borderColor: 'var(--primary)', color: 'var(--primary)' }} onClick={() => updateSOStat(so.id, 'PACKING')}>Packing</button>}
                     </td>
                   </tr>
                 ))}
-                {sos.length === 0 && <tr><td colSpan="7" className="text-center text-muted" style={{ padding: '2rem' }}>Belum ada Sales Order.</td></tr>}
+                {sos.length === 0 && (
+                  <tr>
+                    <td colSpan="7">
+                      <div className="table-empty-state">
+                        <ShoppingCart />
+                        <div className="table-state-title">Belum ada Sales Order</div>
+                        <div className="table-state-desc">Pilih "Buat SO Baru" untuk mulai memproses pesanan customer.</div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -180,11 +200,21 @@ const Fulfillment = () => {
                     <td className="text-right">
                       {sh.status === 'PACKING' && <button className="secondary-btn small" onClick={() => updateShipStat(sh.id, 'READY')}>Siap Kirim</button>}
                       {sh.status === 'READY' && <button className="secondary-btn small" style={{ borderColor: '#3b82f6', color: '#3b82f6' }} onClick={() => updateShipStat(sh.id, 'DISPATCHED')}>Dikirim</button>}
-                      {sh.status === 'DISPATCHED' && <button className="secondary-btn small" style={{ borderColor: '#10b981', color: '#10b981' }} onClick={() => updateShipStat(sh.id, 'DELIVERED')}>Terkirim</button>}
+                      {sh.status === 'DISPATCHED' && <button className="secondary-btn small" style={{ borderColor: 'var(--success)', color: 'var(--success)' }} onClick={() => updateShipStat(sh.id, 'DELIVERED')}>Terkirim</button>}
                     </td>
                   </tr>
                 ))}
-                {shipments.length === 0 && <tr><td colSpan="6" className="text-center text-muted" style={{ padding: '2rem' }}>Belum ada Delivery Order.</td></tr>}
+                {shipments.length === 0 && (
+                  <tr>
+                    <td colSpan="6">
+                      <div className="table-empty-state">
+                        <TruckIcon />
+                        <div className="table-state-title">Belum ada Delivery Order</div>
+                        <div className="table-state-desc">Pilih "Buat Surat Jalan" untuk mulai proses pengiriman.</div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

@@ -1,0 +1,8 @@
+/* Transfer inherits global styles from index.css */
+/* Uses .glass, .page-header, .global-status-banner, .form-group from other CSS */
+
+@media (max-width: 1100px) {
+  .transfer-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

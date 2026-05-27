@@ -184,9 +184,25 @@ const Products = () => {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan="6" className="text-center py-4">Memuat data dari server...</td></tr>
+                <tr>
+                  <td colSpan="6">
+                    <div className="table-loading-state">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+                      <div className="table-state-title">Memuat Data</div>
+                      <div className="table-state-desc">Sedang mengambil master data dari server...</div>
+                    </div>
+                  </td>
+                </tr>
               ) : products.length === 0 ? (
-                <tr><td colSpan="6" className="text-center py-4 text-muted">Data tidak ditemukan.</td></tr>
+                <tr>
+                  <td colSpan="6">
+                    <div className="table-empty-state">
+                      <Package />
+                      <div className="table-state-title">Tidak ada produk ditemukan</div>
+                      <div className="table-state-desc">Gunakan filter atau pencarian lain, atau klik Tambah SKU.</div>
+                    </div>
+                  </td>
+                </tr>
               ) : (
                 products.map(product => (
                   <tr key={product.id}>
@@ -268,7 +284,7 @@ const Products = () => {
             <p>Yakin ingin menghapus produk ini secara permanen?</p>
             <div className="modal-footer" style={{ marginTop: '1.5rem' }}>
               <button className="secondary-btn" onClick={() => setDeleteConfirm(null)}>Batal</button>
-              <button className="primary-btn" style={{ background: '#ef4444', color: 'white' }} onClick={handleDelete}>Ya, Hapus</button>
+              <button className="primary-btn" style={{ background: 'var(--danger)', color: 'white' }} onClick={handleDelete}>Ya, Hapus</button>
             </div>
           </div>
         </div>

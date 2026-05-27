@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Bell, AlertTriangle, Info, ShieldCheck } from 'lucide-react';
+import { Search, Bell, Menu } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import './Header.css';
 
-const Header = () => {
+const Header = ({ onMenuToggle }) => {
+  const navigate = useNavigate();
   const [notifs, setNotifs] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [warehouses, setWarehouses] = useState([]);
+  const [selectedWH, setSelectedWH] = useState(localStorage.getItem('wms_active_warehouse') || '');
+  const [searchVal, setSearchVal] = useState('');
 
   useEffect(() => {
     loadNotifs();
+    loadWarehouses();
     const interval = setInterval(loadNotifs, 30000); // Polling every 30s
     return () => clearInterval(interval);
   }, []);
@@ -18,6 +24,31 @@ const Header = () => {
       const data = await api.getNotifications();
       setNotifs(data || []);
     } catch (e) { console.error(e); }
+  };
+
+  const loadWarehouses = async () => {
+    try {
+      const data = await api.getWarehouses();
+      setWarehouses(data || []);
+      if (data && data.length > 0 && !localStorage.getItem('wms_active_warehouse')) {
+        localStorage.setItem('wms_active_warehouse', data[0].id);
+        setSelectedWH(data[0].id);
+      }
+    } catch (e) { console.error(e); }
+  };
+
+  const handleWarehouseChange = (e) => {
+    const id = e.target.value;
+    localStorage.setItem('wms_active_warehouse', id);
+    setSelectedWH(id);
+    window.location.reload(); // Reload to refresh contexts across pages
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter' && searchVal.trim()) {
+      navigate(`/inventory?search=${encodeURIComponent(searchVal)}`);
+      setSearchVal('');
+    }
   };
 
   const markAsRead = async (id) => {
@@ -30,36 +61,67 @@ const Header = () => {
   const unreadCount = notifs.filter(n => !n.is_read).length;
 
   return (
-    <header className="header glass">
+    <header className="header">
+      {/* Mobile hamburger */}
+      <button className="menu-toggle-btn" onClick={onMenuToggle} aria-label="Toggle menu">
+        <Menu size={22} />
+      </button>
+
       <div className="header-search">
         <Search size={18} className="search-icon" />
-        <input type="text" placeholder="Search SKU, Barcode, or Location..." className="search-input" />
+        <input 
+          type="text" 
+          placeholder="Cari SKU, Barcode, atau Lokasi (Tekan Enter)..." 
+          className="search-input"
+          aria-label="Search"
+          value={searchVal}
+          onChange={(e) => setSearchVal(e.target.value)}
+          onKeyDown={handleSearchKeyDown}
+        />
       </div>
       
       <div className="header-actions">
         <div className="warehouse-selector">
-          <span className="warehouse-label">Current:</span>
-          <select className="warehouse-select"><option>Main Warehouse (JKT)</option></select>
+          <span className="warehouse-label" id="warehouse-label">Gudang</span>
+          <select className="warehouse-select" aria-labelledby="warehouse-label" value={selectedWH} onChange={handleWarehouseChange}>
+            {warehouses.map(wh => (
+              <option key={wh.id} value={wh.id}>{wh.name} ({wh.code})</option>
+            ))}
+            {warehouses.length === 0 && <option>Main Warehouse (JKT)</option>}
+          </select>
         </div>
         
-        <div style={{ position: 'relative' }}>
-          <button className="notification-btn" onClick={() => setShowDropdown(!showDropdown)}>
+        <div className="notification-wrapper">
+          <button className="notification-btn" aria-label="Notifications" aria-expanded={showDropdown} onClick={() => setShowDropdown(!showDropdown)}>
             <Bell size={20} />
-            {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
+            {unreadCount > 0 && <span className="notification-badge" aria-label={`${unreadCount} unread`}>{unreadCount}</span>}
           </button>
-
+ 
           {showDropdown && (
-            <div className="notif-dropdown glass" style={{ position: 'absolute', right: 0, top: '45px', width: '350px', zIndex: 1000, borderRadius: '8px', padding: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}>
-              <h4 style={{ margin: '0 0 1rem 0', borderBottom: '1px solid #333', paddingBottom: '0.5rem' }}>Notifikasi</h4>
-              {notifs.length === 0 ? <p className="text-muted text-center">Tidak ada notifikasi.</p> : (
-                <div style={{ maxHeight: '300px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+            <div className="notif-dropdown">
+              <div className="notif-dropdown-header">
+                <h4>Notifikasi</h4>
+                {unreadCount > 0 && <span className="unread-dot-label">{unreadCount} Baru</span>}
+              </div>
+              {notifs.length === 0 ? (
+                <div className="notif-empty">
+                  <p>Tidak ada notifikasi baru</p>
+                </div>
+              ) : (
+                <div className="notif-list">
                   {notifs.map(n => (
-                    <div key={n.id} style={{ opacity: n.is_read ? 0.6 : 1, padding: '0.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', fontSize: '0.85rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
-                        <strong style={{ color: n.type === 'WARNING' ? '#ef4444' : (n.type === 'APPROVAL_REQUIRED' ? '#f59e0b' : '#6366f1') }}>{n.title}</strong>
-                        {!n.is_read && <button onClick={() => markAsRead(n.id)} style={{ background: 'none', border: 'none', color: '#10b981', cursor: 'pointer', fontSize: '0.7rem' }}>Tandai Dibaca</button>}
+                    <div key={n.id} className={`notif-item ${n.is_read ? 'read' : 'unread'}`}>
+                      <div className="notif-item-header">
+                        <span className={`notif-tag ${n.type.toLowerCase()}`}>
+                          {n.title}
+                        </span>
+                        {!n.is_read && (
+                          <button className="mark-read-btn" onClick={() => markAsRead(n.id)}>
+                            Tandai dibaca
+                          </button>
+                        )}
                       </div>
-                      <p style={{ margin: 0, color: '#ccc' }}>{n.message}</p>
+                      <p className="notif-message">{n.message}</p>
                     </div>
                   ))}
                 </div>

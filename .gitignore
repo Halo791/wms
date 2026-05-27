@@ -4,8 +4,7 @@ vendor/
 
 # Environment
 .env
-.env.backup
-.env.production
+
 
 # IDE
 .idea/
@@ -36,3 +35,6 @@ bootstrap/cache/*
 # Misc
 npm-debug.log
 yarn-error.log
+php83.zip
+php83/
+vc_redist.x64.exe

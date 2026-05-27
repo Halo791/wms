@@ -91,10 +91,6 @@ const api = {
   getWarehouseMap: () => request('/warehouse-map'),
   triggerNightCompaction: () => request('/night-compaction/trigger', { method: 'POST' }),
 
-  // ========================
-  // E2E SUPPLY CHAIN
-  // ========================
-
   // Suppliers
   getSuppliers: (params = {}) => { const qs = new URLSearchParams(params).toString(); return request(`/suppliers${qs ? `?${qs}` : ''}`); },
   createSupplier: (data) => request('/suppliers', { method: 'POST', body: JSON.stringify(data) }),
@@ -124,18 +120,19 @@ const api = {
   createShipment: (data) => request('/shipments', { method: 'POST', body: JSON.stringify(data) }),
   updateShipmentStatus: (id, status) => request(`/shipments/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
 
-  // ========================
-  // OPERATIONAL (AUDIT & APPROVALS)
-  // ========================
+  // Operational
   getNotifications: () => request('/notifications'),
   markNotificationRead: (id) => request(`/notifications/${id}/read`, { method: 'PUT' }),
-  
   getActivityLogs: (page = 1) => request(`/activity-logs?page=${page}`),
-  
   getPendingApprovals: () => request('/approvals/pending'),
   processApproval: (id, data) => request(`/approvals/${id}/process`, { method: 'POST', body: JSON.stringify(data) }),
-  
   submitManualTransaction: (data) => request('/transactions/manual', { method: 'POST', body: JSON.stringify(data) }),
+
+  // Receiving (Barang Masuk terhubung PO)
+  submitReceiving: (data) => request('/inbound/receive', { method: 'POST', body: JSON.stringify(data) }),
+
+  // Dashboard Stats
+  getDashboardStats: () => request('/dashboard/stats'),
 };
 
 export default api;

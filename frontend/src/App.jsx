@@ -6,6 +6,8 @@ import Products from './pages/Products';
 import Inventory from './pages/Inventory';
 import Inbound from './pages/Inbound';
 import Outbound from './pages/Outbound';
+import StockOpname from './pages/StockOpname';
+import Transfer from './pages/Transfer';
 import SupplyChain from './pages/SupplyChain';
 import Fulfillment from './pages/Fulfillment';
 import Approvals from './pages/Approvals';
@@ -31,6 +33,8 @@ function App() {
           <Route path="supply-chain" element={<SupplyChain />} />
           <Route path="inbound" element={<Inbound />} />
           <Route path="outbound" element={<Outbound />} />
+          <Route path="stock-opname" element={<StockOpname />} />
+          <Route path="transfer" element={<Transfer />} />
           <Route path="fulfillment" element={<Fulfillment />} />
           <Route path="approvals" element={<Approvals />} />
         </Route>

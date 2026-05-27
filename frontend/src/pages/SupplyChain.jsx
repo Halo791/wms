@@ -83,7 +83,7 @@ const SupplyChain = () => {
   const removePOItem = (idx) => setPoForm(f => ({ ...f, items: f.items.filter((_, i) => i !== idx) }));
   const updatePOItem = (idx, field, val) => setPoForm(f => ({ ...f, items: f.items.map((it, i) => i === idx ? { ...it, [field]: val } : it) }));
 
-  const statusColors = { DRAFT: '#94a3b8', CONFIRMED: '#6366f1', RECEIVING: '#f59e0b', COMPLETED: '#10b981', CANCELLED: '#ef4444' };
+  const statusColors = { DRAFT: '#9CA3AF', CONFIRMED: '#6D5DF6', RECEIVING: '#f59e0b', COMPLETED: '#10b981', CANCELLED: '#ef4444' };
 
   return (
     <div className="sc-container">
@@ -119,7 +119,17 @@ const SupplyChain = () => {
                     <td className="text-right"><button className="icon-btn delete" onClick={() => deleteSupplier(s.id)}>×</button></td>
                   </tr>
                 ))}
-                {suppliers.length === 0 && <tr><td colSpan="6" className="text-center text-muted" style={{ padding: '2rem' }}>Belum ada data supplier.</td></tr>}
+                {suppliers.length === 0 && (
+                  <tr>
+                    <td colSpan="6">
+                      <div className="table-empty-state">
+                        <Truck />
+                        <div className="table-state-title">Belum ada data supplier</div>
+                        <div className="table-state-desc">Klik Tambah Supplier untuk mendaftarkan mitra bisnis baru.</div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -153,11 +163,21 @@ const SupplyChain = () => {
                     <td>{po.items?.length || 0} SKU</td>
                     <td className="text-right">
                       {po.status === 'CONFIRMED' && <button className="secondary-btn small" onClick={() => updatePOStatus(po.id, 'RECEIVING')}>Terima</button>}
-                      {po.status === 'RECEIVING' && <button className="secondary-btn small" style={{ borderColor: '#10b981', color: '#10b981' }} onClick={() => updatePOStatus(po.id, 'COMPLETED')}>Selesai</button>}
+                      {po.status === 'RECEIVING' && <button className="secondary-btn small" style={{ borderColor: 'var(--success)', color: 'var(--success)' }} onClick={() => updatePOStatus(po.id, 'COMPLETED')}>Selesai</button>}
                     </td>
                   </tr>
                 ))}
-                {pos.length === 0 && <tr><td colSpan="7" className="text-center text-muted" style={{ padding: '2rem' }}>Belum ada Purchase Order.</td></tr>}
+                {pos.length === 0 && (
+                  <tr>
+                    <td colSpan="7">
+                      <div className="table-empty-state">
+                        <FileText />
+                        <div className="table-state-title">Belum ada Purchase Order</div>
+                        <div className="table-state-desc">Pilih "Buat PO Baru" untuk mulai memesan barang dari supplier.</div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
