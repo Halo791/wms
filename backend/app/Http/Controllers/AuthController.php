@@ -9,6 +9,11 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    public function user(Request $request)
+    {
+        return $request->user();
+    }
+
     public function login(Request $request)
     {
         $request->validate([

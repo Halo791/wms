@@ -6,19 +6,17 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.3",
-        "laravel/framework": "^13.8",
-        "laravel/sanctum": "^4.0",
-        "laravel/tinker": "^3.0"
+        "php": "^8.1",
+        "laravel/framework": "^10.0",
+        "laravel/sanctum": "^3.3",
+        "laravel/tinker": "^2.8"
     },
     "require-dev": {
-        "fakerphp/faker": "^1.23",
-        "laravel/pail": "^1.2.5",
-        "laravel/pao": "^1.0.6",
-        "laravel/pint": "^1.27",
+        "fakerphp/faker": "^1.9.1",
+        "laravel/pint": "^1.0",
         "mockery/mockery": "^1.6",
-        "nunomaduro/collision": "^8.6",
-        "phpunit/phpunit": "^12.5.12"
+        "nunomaduro/collision": "^7.0",
+        "phpunit/phpunit": "^10.1"
     },
     "autoload": {
         "psr-4": {
@@ -43,7 +41,7 @@
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1 --timeout=0\" \"npm run dev\" --names=server,queue,vite --kill-others"
         ],
         "test": [
             "@php artisan config:clear --ansi @no_additional_args",

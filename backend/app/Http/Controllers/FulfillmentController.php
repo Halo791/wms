@@ -19,7 +19,9 @@ class FulfillmentController extends Controller
         $query = Customer::query();
         if ($request->filled('search')) {
             $s = $request->search;
-            $query->where(fn($q) => $q->where('name', 'like', "%$s%")->orWhere('code', 'like', "%$s%"));
+            $query->where(function ($q) use ($s) {
+                $q->where('name', 'like', "%$s%")->orWhere('code', 'like', "%$s%");
+            });
         }
         return response()->json($query->orderBy('created_at', 'desc')->paginate($request->input('per_page', 10)));
     }
@@ -65,7 +67,9 @@ class FulfillmentController extends Controller
         if ($request->filled('status')) $query->where('status', $request->status);
         if ($request->filled('search')) {
             $s = $request->search;
-            $query->where(fn($q) => $q->where('so_number', 'like', "%$s%"));
+            $query->where(function ($q) use ($s) {
+                $q->where('so_number', 'like', "%$s%");
+            });
         }
         return response()->json($query->orderBy('created_at', 'desc')->paginate($request->input('per_page', 10)));
     }

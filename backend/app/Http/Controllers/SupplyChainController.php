@@ -18,7 +18,9 @@ class SupplyChainController extends Controller
         $query = Supplier::query();
         if ($request->filled('search')) {
             $s = $request->search;
-            $query->where(fn($q) => $q->where('name', 'like', "%$s%")->orWhere('code', 'like', "%$s%"));
+            $query->where(function ($q) use ($s) {
+                $q->where('name', 'like', "%$s%")->orWhere('code', 'like', "%$s%");
+            });
         }
         return response()->json($query->orderBy('created_at', 'desc')->paginate($request->input('per_page', 10)));
     }
@@ -64,7 +66,9 @@ class SupplyChainController extends Controller
         if ($request->filled('status')) $query->where('status', $request->status);
         if ($request->filled('search')) {
             $s = $request->search;
-            $query->where(fn($q) => $q->where('po_number', 'like', "%$s%"));
+            $query->where(function ($q) use ($s) {
+                $q->where('po_number', 'like', "%$s%");
+            });
         }
         return response()->json($query->orderBy('created_at', 'desc')->paginate($request->input('per_page', 10)));
     }

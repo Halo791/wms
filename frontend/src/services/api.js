@@ -1,4 +1,4 @@
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
 function getToken() {
   return localStorage.getItem('wms_token');
@@ -65,13 +65,13 @@ const api = {
   deleteProduct: (id) => request(`/products/${id}`, { method: 'DELETE' }),
   importProducts: (formData) => {
     const token = getToken();
-    return fetch('/api/products/import', {
+    return fetch(`${API_BASE}/products/import`, {
       method: 'POST',
       headers: { ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
       body: formData,
     }).then(r => r.json());
   },
-  getExportUrl: () => '/api/products/export',
+  getExportUrl: () => `${API_BASE}/products/export`,
 
   // Inventory Stocks
   getStocks: () => request('/stocks'),
