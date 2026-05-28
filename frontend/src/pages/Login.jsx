@@ -30,8 +30,8 @@ const Login = () => {
       <div className="glass-panel" style={{ width: '400px', padding: '2.5rem', textAlign: 'center' }}>
         <div style={{ marginBottom: '2rem' }}>
           <Layers size={56} color="var(--primary)" style={{ marginBottom: '1rem', dropShadow: '0 4px 6px rgba(99, 102, 241, 0.3)' }} />
-          <h2 style={{ margin: 0, fontSize: '1.8rem' }}>Aero<span style={{ color: 'var(--primary)' }}>WMS</span></h2>
-          <p className="text-muted" style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>Enterprise Login</p>
+          <h2 style={{ margin: 0, fontSize: '1.8rem' }}>gudang<span style={{ color: 'var(--primary)' }}>.hovertech</span></h2>
+          <p className="text-muted" style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>Sistem Informasi Gudang</p>
         </div>
         
         {error && <div style={{ background: 'var(--danger-transparent)', color: 'var(--danger)', padding: '0.8rem', borderRadius: '8px', marginBottom: '1.5rem', fontSize: '0.9rem', fontWeight: '500' }}>{error}</div>}

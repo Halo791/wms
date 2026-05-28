@@ -119,7 +119,7 @@ const MobileScanner = () => {
     <div className="mobile-scanner-layout">
       {/* Header */}
       <div className="scanner-header">
-        <h1 className="app-title">AERO<span>WMS</span> MOBILE</h1>
+        <h1 className="app-title">gudang<span>.hovertech</span> MOBILE</h1>
         <div className="operator-badge">
           <span className="dot online"></span>
           <span>Operator 1</span>

@@ -42,7 +42,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         <div className="logo-icon">
           <Layers size={22} />
         </div>
-        <h2 className="logo-text">Aero<span>WMS</span></h2>
+        <h2 className="logo-text">gudang<span>.hovertech</span></h2>
       </div>
       
       <nav className="sidebar-nav">
