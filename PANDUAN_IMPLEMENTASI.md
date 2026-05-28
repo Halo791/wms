@@ -1,10 +1,10 @@
-# PANDUAN IMPLEMENTASI & GO-LIVE (AERO WMS)
+# PANDUAN IMPLEMENTASI & GO-LIVE (gudang.hovertech)
 *Dokumen Resmi Skema Pemasangan Sistem di Gudang Fisik (Shopfloor)*
 
 ---
 
 ## 1. Konsep Dasar Implementasi
-Aero WMS dirancang dengan pendekatan **Decoupled Architecture** (Pemisahan Backend & Frontend) serta **Hardware Agnostic** (Tidak terikat perangkat keras khusus). Hal ini memungkinkan pabrik atau gudang kecil hingga besar untuk mengimplementasikan sistem ini dengan modal perangkat keras yang sangat minimal.
+gudang.hovertech dirancang dengan pendekatan **Decoupled Architecture** (Pemisahan Backend & Frontend) serta **Hardware Agnostic** (Tidak terikat perangkat keras khusus). Hal ini memungkinkan pabrik atau gudang kecil hingga besar untuk mengimplementasikan sistem ini dengan modal perangkat keras yang sangat minimal.
 
 Sistem tidak mewajibkan penggunaan PDA Windows CE yang mahal (Zebra/Motorola), melainkan dapat berjalan mulus di *Smartphone* Android standar.
 
@@ -60,14 +60,14 @@ Karena ini menggunakan Laravel & React, pemasangan di server lokal (*On-Premise*
 
 ## 4. Cara Setup di HP Operator (PWA Scanner)
 
-Ini adalah fitur terbaik dari Aero WMS. Anda tidak perlu mem-build `.apk` atau mengunggah aplikasi ke Google PlayStore.
+Ini adalah fitur terbaik dari gudang.hovertech. Anda tidak perlu mem-build `.apk` atau mengunggah aplikasi ke Google PlayStore.
 
 1.  Minta operator menyambungkan HP-nya ke jaringan WiFi gudang.
 2.  Buka aplikasi **Google Chrome** di HP.
 3.  Ketikkan alamat IP dari PC Server disusul dengan *port* frontend (Contoh: `http://192.168.1.15:5173/scanner`).
 4.  Layar HP akan menampilkan UI Gelap (*Dark Mode*) khas perangkat industrial.
 5.  Tekan menu titik tiga di pojok kanan atas Chrome, lalu pilih **"Add to Home Screen"** (Tambahkan ke Layar Utama).
-6.  Selesai! Aplikasi Aero WMS Scanner kini muncul sebagai ikon di menu HP operator layaknya aplikasi biasa, lengkap dengan kemampuan *Full Screen* dan *Haptic Feedback* (getaran saat scan).
+6.  Selesai! Aplikasi gudang.hovertech Scanner kini muncul sebagai ikon di menu HP operator layaknya aplikasi biasa, lengkap dengan kemampuan *Full Screen* dan *Haptic Feedback* (getaran saat scan).
 
 ---
 

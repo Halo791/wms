@@ -15,7 +15,7 @@ use App\Models\InventoryStock;
 use App\Models\InventoryTransaction;
 
 echo "===============================================\n";
-echo "AERO WMS - SIMULASI E2E DEMO (INBOUND & OUTBOUND)\n";
+echo "gudang.hovertech - SIMULASI E2E DEMO (INBOUND & OUTBOUND)\n";
 echo "===============================================\n\n";
 
 $operator = User::where('role', 'operator')->first();

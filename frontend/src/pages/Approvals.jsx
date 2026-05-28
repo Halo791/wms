@@ -65,7 +65,7 @@ const Approvals = () => {
       <div className="page-header">
         <div className="header-title">
           <div className="icon-wrapper" style={{ background: 'var(--danger-transparent)' }}><ShieldCheck size={24} className="text-danger" style={{color: 'var(--danger)'}} /></div>
-          <div><h2>Audit & Approvals</h2><p className="text-muted">General Audit Trail & WMS Authorization Workflow</p></div>
+          <div><h2>Audit & Approvals</h2><p className="text-muted">General Audit Trail & gudang.hovertech Authorization Workflow</p></div>
         </div>
       </div>
 

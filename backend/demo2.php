@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\OperationalController;
 
 echo "===============================================\n";
-echo "AERO WMS - SIMULASI E2E MENU LANJUTAN\n";
+echo "gudang.hovertech - SIMULASI E2E MENU LANJUTAN\n";
 echo "(Stock Opname, Transfer/Relokasi)\n";
 echo "===============================================\n\n";
 

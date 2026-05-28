@@ -8,7 +8,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AeroWMS Mobile', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('gudang.hovertech Mobile', style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       body: Padding(

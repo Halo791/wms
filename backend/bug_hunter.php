@@ -14,7 +14,7 @@ use App\Http\Controllers\InventoryTransactionController;
 use App\Http\Controllers\OperationalController;
 
 echo "===============================================\n";
-echo "AERO WMS - STRESS TEST & BUG HUNTER\n";
+echo "gudang.hovertech - STRESS TEST & BUG HUNTER\n";
 echo "===============================================\n\n";
 
 $operator = User::where('role', 'operator')->first();

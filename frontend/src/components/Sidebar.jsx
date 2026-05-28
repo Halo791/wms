@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Layers, Truck, ArrowDownToLine, ArrowUpFromLine, PackageSearch, ClipboardCheck, ArrowLeftRight, Users, ShieldCheck, LogOut, X } from 'lucide-react';
+import { LayoutDashboard, Layers, Truck, ArrowDownToLine, ArrowUpFromLine, PackageSearch, ClipboardCheck, ArrowLeftRight, Users, ShieldCheck, LogOut, X, Warehouse } from 'lucide-react';
 import api from '../services/api';
 import './Sidebar.css';
 
@@ -40,7 +40,7 @@ const Sidebar = ({ isOpen, onClose }) => {
 
       <div className="sidebar-header">
         <div className="logo-icon">
-          <Layers size={22} />
+          <Warehouse size={22} />
         </div>
         <h2 className="logo-text">gudang<span>.hovertech</span></h2>
       </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layers, Lock, User } from 'lucide-react';
+import { Lock, User, Warehouse } from 'lucide-react';
 import api from '../services/api';
 
 const Login = () => {
@@ -29,7 +29,7 @@ const Login = () => {
     <div style={{ display: 'flex', height: '100vh', background: 'var(--bg-base)', color: 'var(--text-primary)', alignItems: 'center', justifyContent: 'center' }}>
       <div className="glass-panel" style={{ width: '400px', padding: '2.5rem', textAlign: 'center' }}>
         <div style={{ marginBottom: '2rem' }}>
-          <Layers size={56} color="var(--primary)" style={{ marginBottom: '1rem', dropShadow: '0 4px 6px rgba(99, 102, 241, 0.3)' }} />
+          <Warehouse size={56} color="var(--primary)" style={{ marginBottom: '1rem', dropShadow: '0 4px 6px rgba(99, 102, 241, 0.3)' }} />
           <h2 style={{ margin: 0, fontSize: '1.8rem' }}>gudang<span style={{ color: 'var(--primary)' }}>.hovertech</span></h2>
           <p className="text-muted" style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>Sistem Informasi Gudang</p>
         </div>

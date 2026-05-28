@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 
 void main() {
-  runApp(const AeroWMSApp());
+  runApp(const GudangHovertechApp());
 }
 
-class AeroWMSApp extends StatelessWidget {
-  const AeroWMSApp({super.key});
+class GudangHovertechApp extends StatelessWidget {
+  const GudangHovertechApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Aero WMS Scanner',
+      title: 'gudang.hovertech Scanner',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF6366F1), // Indigo Primary

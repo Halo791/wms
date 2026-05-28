@@ -84,7 +84,7 @@ const MobileScanner = () => {
   const submitPutaway = async () => {
     if (!locationId || scannedItems.length === 0) return;
     setIsProcessing(true);
-    setStatusMsg({ text: 'Mengirim Misi ke WMS...', type: 'info' });
+    setStatusMsg({ text: 'Mengirim misi ke gudang.hovertech...', type: 'info' });
 
     try {
       const payload = {

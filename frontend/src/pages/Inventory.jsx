@@ -67,7 +67,7 @@ const Inventory = () => {
         <div className="header-actions-inventory">
           <button className="secondary-btn" onClick={fetchStocks} disabled={loading}>
             <RefreshCw size={18} className={loading ? 'spinning' : ''} />
-            <span>Sync WMS-SAM</span>
+            <span>Sync gudang.hovertech</span>
           </button>
           <button 
             className={`primary-btn ${showAdvanced ? 'active-filter' : ''}`} 
@@ -162,7 +162,7 @@ const Inventory = () => {
                     <div className="table-empty-state">
                       <PackageSearch />
                       <div className="table-state-title">Tidak ada data stok</div>
-                      <div className="table-state-desc">Ubah kriteria pencarian atau sinkronisasikan ulang dengan sistem WMS.</div>
+                      <div className="table-state-desc">Ubah kriteria pencarian atau sinkronisasikan ulang dengan gudang.hovertech.</div>
                     </div>
                   </td>
                 </tr>

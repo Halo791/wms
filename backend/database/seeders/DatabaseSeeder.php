@@ -56,7 +56,7 @@ class DatabaseSeeder extends Seeder
         // 2. Create Warehouse
         $warehouse = Warehouse::firstOrCreate(['code' => 'WH-JKT-01'], [
             'id' => Str::uuid(),
-            'name' => 'Aero Hub Jakarta Pusat',
+            'name' => 'gudang.hovertech Hub Jakarta Pusat',
             'address' => 'Jl. Jenderal Sudirman Kav. 21, Jakarta Pusat, DKI Jakarta',
             'is_active' => true,
         ]);

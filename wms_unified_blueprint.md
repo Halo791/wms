@@ -1,10 +1,10 @@
-# AERO WMS: UNIFIED BLUEPRINT & ROADMAP
+# gudang.hovertech: UNIFIED BLUEPRINT & ROADMAP
 *Dokumen Konsolidasi: WMS Master Plan + WMS Analysis + WMS-SAM Deep Analysis*
 
 ---
 
 ## 1. Executive Summary
-Aero WMS dirancang untuk tidak sekadar menjadi sistem pencatatan inventaris (Basic WMS), melainkan sebuah **Warehouse Orchestration System (WES/WCS)** tingkat Enterprise. Sistem ini mengadopsi standar logika pabrik pintar (*Smart Factory / Industry 4.0*) yang terinspirasi dari arsitektur *Uteco Contec WMS-SAM*, di mana perangkat lunak secara proaktif mengendalikan mesin (PLC, AGV, Stacker Crane) sekaligus memandu manusia melalui antarmuka seluler modern.
+gudang.hovertech dirancang untuk tidak sekadar menjadi sistem pencatatan inventaris (Basic WMS), melainkan sebuah **Warehouse Orchestration System (WES/WCS)** tingkat Enterprise. Sistem ini mengadopsi standar logika pabrik pintar (*Smart Factory / Industry 4.0*) yang terinspirasi dari arsitektur *Uteco Contec WMS-SAM*, di mana perangkat lunak secara proaktif mengendalikan mesin (PLC, AGV, Stacker Crane) sekaligus memandu manusia melalui antarmuka seluler modern.
 
 ## 2. Arsitektur Integrasi Terpadu (Unified Stack)
 
