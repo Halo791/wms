@@ -1,3 +1,5 @@
+version: "3.3"
+
 services:
   backend:
     build:
@@ -23,8 +25,17 @@ services:
     volumes:
       - wms_backend_data:/var/www/data
       - wms_backend_storage:/var/www/backend/storage
-    ports:
-      - "8000:8000"
+    networks:
+      - traefik-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-network"
+      - "traefik.http.routers.wms-backend-router.rule=Host(`gudang-backend.hovertech.my.id`)"
+      - "traefik.http.routers.wms-backend-router.entryPoints=websecure"
+      - "traefik.http.routers.wms-backend-router.tls=true"
+      - "traefik.http.routers.wms-backend-router.tls.certresolver=leResolver"
+      - "traefik.http.routers.wms-backend-router.service=wms-backend-service@docker"
+      - "traefik.http.services.wms-backend-service.loadbalancer.server.port=8000"
     restart: unless-stopped
 
   frontend:
@@ -33,11 +44,24 @@ services:
       dockerfile: docker/frontend/Dockerfile
       args:
         VITE_API_BASE_URL: https://gudang-backend.hovertech.my.id/api
-    ports:
-      - "8080:80"
+    networks:
+      - traefik-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-network"
+      - "traefik.http.routers.wms-frontend-router.rule=Host(`gudang.hovertech.my.id`)"
+      - "traefik.http.routers.wms-frontend-router.entryPoints=websecure"
+      - "traefik.http.routers.wms-frontend-router.tls=true"
+      - "traefik.http.routers.wms-frontend-router.tls.certresolver=leResolver"
+      - "traefik.http.routers.wms-frontend-router.service=wms-frontend-service@docker"
+      - "traefik.http.services.wms-frontend-service.loadbalancer.server.port=80"
     depends_on:
       - backend
     restart: unless-stopped
+
+networks:
+  traefik-network:
+    external: true
 
 volumes:
   wms_backend_data:
